@@ -4,6 +4,7 @@ const Order = require('../models/order')
 const express = require('express');
 const orderController = require('../controllers/Order');
 const Wallet = require('../models/wallet');
+const ClientCompany = require('../models/clientCompany');
 const router = express.Router();
 
 router.post('/createOrder', async (req, res) => {
@@ -24,6 +25,19 @@ router.post('/createOrder', async (req, res) => {
       quantity: item.quantity,
       totalPrice: item.totalPrice,
     }));
+
+    const user = await User.findOne({_id:userId})
+    const userCompany = user.company;
+
+    const company = await ClientCompany.findOne({companyName:userCompany})
+    const payBackDay = company.companyPayBackDay
+    const updatedPBD = payBackDay - 3
+
+    const currentDate = new Date();
+    const currentDay = currentDate.getDate();
+    if(currentDay >= updatedPBD && currentDay <= payBackDay){
+      return res.status(404).json({ message: 'You can not place an order at this current state' });
+    }
 
     // Find the wallet entry for the specified userId
     const wallet = await Wallet.findOne({ userId });

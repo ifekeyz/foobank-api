@@ -10,6 +10,7 @@ const Wallet = require('../models/wallet');
 const { transporter } = require('../helpers/util');
 const AdminVat = require('../models/admin');
 const { flutterwavePublicKey } = require('../config/config');
+const ClientCompany = require('../models/clientCompany');
 const router = express.Router();
 
 
@@ -212,7 +213,7 @@ router.post('/createCompany', async (req, res) => {
 router.get('/getAllCompany', async (req, res) => {
     try {
         // Retrieve all companies
-        const company = await Company.find();
+        const company = await ClientCompany.find();
 
         res.status(200).json(company);
     } catch (error) {

@@ -44,6 +44,7 @@ function authJwt(){
             {url:/\/api\/v1\/company\/statistic(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/company\/registeredStaff(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/company\/approveStaff(.*)/,methods:['PUT','OPTIONS']},
+            {url:/\/api\/v1\/company\/declineStaff(.*)/,methods:['PUT','OPTIONS']},
             {url:/\/api\/v1\/company\/loanTransaction(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/company\/staffRequestHistory(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/company\/companyPayment(.*)/,methods:['POST','OPTIONS']},

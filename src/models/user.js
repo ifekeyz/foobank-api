@@ -61,10 +61,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:''
     },
-    companyApprove:{
-        type:Boolean,
-        default:false
-    }
+    companyApprove:{ type: String, enum: ['pending','approved','declined'], default: 'pending' }
 })
 userSchema.virtual('id').get(function (){
     return this._id.toHexString();

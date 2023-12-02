@@ -248,9 +248,9 @@ router.put('/approveStaff/:id', async (req, res) => {
         if (!user) {
             return res.status(400).json({ message: 'user not found' });
         }
-        if (user.companyApprove == false) {
+        if (user.companyApprove == 'pending') {
 
-            user.companyApprove = true;
+            user.companyApprove = 'approved';
             await user.save();
             // Email content
             const mailOptions = {
@@ -274,6 +274,42 @@ router.put('/approveStaff/:id', async (req, res) => {
         res.status(500).json({ message: 'Error', error: error.message });
     }
 })
+
+router.put('/declineStaff/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(400).json({ message: 'user not found' });
+        }
+        if (user.companyApprove == 'pending') {
+
+            user.companyApprove = 'declined';
+            await user.save();
+            // Email content
+            const mailOptions = {
+                from: user.email,
+                to: 'info@foodbank-app.com.ng',
+                subject: `${user.company} Disapprove`,
+                html: `Hi <p>${user.fullname}, of user identity of ${user.id}</p>
+                <p>Has not been approved by us.</p>
+                <p>We want you to know that the aim of this is to simplify the burden, and we have got this right with you.</p>
+                <p>Regards,</p>
+                <p>Team ${user.company}.</p>`
+            };
+
+            await transporter.sendMail(mailOptions);
+
+            return res.status(200).json({ message: 'User approved successfully' });
+        } else {
+            return res.status(400).json({ message: 'User cannot be accepted in its current state' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error', error: error.message });
+    }
+});
 
 router.get('/loanTransaction/:companyName', async (req, res) => {
     try {
@@ -338,7 +374,7 @@ router.get('/staffRequestHistory/:companyName', async (req, res) => {
 router.post('/companyPayment/:companyName', uploadOptions.single('image'), async (req, res) => {
     try {
         const companyName = req.params.companyName;
-        const amountPaid  = req.body.amountPaid;
+        const amountPaid = req.body.amountPaid;
 
         const file = req.file;
         if (!file) { return res.status(400).send("No image in the request") }
@@ -367,7 +403,7 @@ router.post('/companyPayment/:companyName', uploadOptions.single('image'), async
 
         res.status(200).json(savePayment);
     } catch (error) {
-        
+
         res.status(500).json({ message: 'Error', error: error.message });
     }
 })
@@ -375,7 +411,7 @@ router.post('/companyPayment/:companyName', uploadOptions.single('image'), async
 router.get('/companyPayment/:companyName', async (req, res) => {
     try {
         const companyName = req.params.companyName;
-        const payment = await Payment.find({companyName:companyName});
+        const payment = await Payment.find({ companyName: companyName });
 
         if (!payment) {
             return res.status(404).json({ message: 'payment not found' });
