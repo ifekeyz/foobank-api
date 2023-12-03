@@ -11,6 +11,8 @@ function authJwt(){
         isRevoked:isRevoked
     }).unless({
         path:[
+            `/`,
+            `public/uploads/(.*)`,
             `${api}/users/login`,
             `${api}/users/register`,
             `${api}/users/(.*)`,
