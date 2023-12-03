@@ -366,9 +366,9 @@ router.put('/updateUserLoan/:userId', async(req, res)=>{
 
 router.post('/postPayment', async(req, res)=>{
     try{
-        const { fullName, vat, serviceFee,deliveryFee } = req.body;
+        const { fullName, vat, serviceFee,deliveryFee, interest } = req.body;
 
-        const exitsummary = await AdminVat.findOne({vat,serviceFee,deliveryFee})
+        const exitsummary = await AdminVat.findOne({vat,serviceFee,deliveryFee,interest})
         if(exitsummary){
             return res.status(400).json({ message:"VAT,ServiceFee and DeliveryFees already exist"})
         }
@@ -378,7 +378,8 @@ router.post('/postPayment', async(req, res)=>{
             fullName,
             vat, 
             serviceFee,
-            deliveryFee
+            deliveryFee,
+            interest
         });
 
         // Save the new staff member to the database
