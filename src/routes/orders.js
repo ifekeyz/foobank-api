@@ -72,7 +72,7 @@ router.post('/createOrder', async (req, res) => {
         res.status(200).json(newOrder);
 
       }else{
-        res.status(500).json({ message: 'Update your current loan to continue your order'});
+        res.status(501).json({ message: 'Update your current loan to continue your order'});
       
       }
     }
