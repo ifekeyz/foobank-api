@@ -71,7 +71,33 @@ router.post('/createOrder', async (req, res) => {
 
         res.status(200).json(newOrder);
 
-      }else{
+      }
+        else if(wallet.montlyPayBack == 0){
+        const newOrder = new Order({
+          userId,
+          orderItems,
+          deliveryDetails: {
+            city: deliveryDetails.city,
+            state: deliveryDetails.state,
+            location: deliveryDetails.location,
+            phoneNumber: deliveryDetails.phoneNumber,
+          },
+          allItemsTotalPrice,
+          userFullname
+        });
+
+        // Save the new order
+        await newOrder.save();
+
+        // Clear the user's cart since items have been ordered
+        cart.items = [];
+        wallet.paidLoan = 0;
+        await wallet.save();
+        await cart.save();
+
+        res.status(200).json(newOrder);
+      }
+      else{
         res.status(501).json({ message: 'Update your current loan to continue your order'});
       
       }
