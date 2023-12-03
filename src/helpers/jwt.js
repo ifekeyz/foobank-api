@@ -12,7 +12,7 @@ function authJwt(){
     }).unless({
         path:[
             `/`,
-            `public/uploads/(.*)`,
+            `/public/uploads/(.*)`,
             `${api}/users/login`,
             `${api}/users/register`,
             `${api}/users/(.*)`,
