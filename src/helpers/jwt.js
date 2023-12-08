@@ -54,6 +54,9 @@ function authJwt(){
             {url:/\/api\/v1\/driver\/deliveryPickup(.*)/,methods:['POST','OPTIONS']},
             {url:/\/api\/v1\/driver\/deliveryDropoff(.*)/,methods:['POST','OPTIONS']},
             {url:/\/api\/v1\/driver\/getApprovedOrders(.*)/,methods:['GET','OPTIONS']},
+            {url:/\/api\/v1\/driver\/getDeliveryHistory(.*)/,methods:['GET','OPTIONS']},
+            {url:/\/api\/v1\/company\/send-verification-code(.*)/,methods:['POST','OPTIONS']},
+            {url:/\/api\/v1\/company\/change\/password(.*)/,methods:['PUT','OPTIONS']},
             
 
         ]

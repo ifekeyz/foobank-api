@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
+const { transporter } = require('../config/config');
 
 const FILE_TYPE_MAP = {
     'image/png': 'png',
@@ -31,15 +32,6 @@ const storage = multer.diskStorage({
 const uploadOptions = multer({ storage: storage })
 
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL
-    auth: {
-        user: 'sovereigntechnology01@gmail.com',
-        pass: 'rqjcpfdszavqbpby'
-    }
-});
 
 
 router.get('/', async (req, res) => {
@@ -94,7 +86,7 @@ router.post('/', async (req, res) => {
 
         // Email content
         const mailOptions = {
-            from: 'sovereigntechnology01@gmail.com',
+            from: 'no-reply@sovereigntechltd.com',
             to: req.body.email, // Use the provided email from the request
             subject: 'OTP-Request',
             text: `Your verification code for FoodBankApp Registration is : ${verificationCode}`,
@@ -121,7 +113,7 @@ router.put('/resend-mail', async (req, res) => {
         const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
         // Email content
         const mailOptions = {
-            from: 'sovereigntechnology01@gmail.com',
+            from: 'no-reply@sovereigntechltd.com',
             to: req.body.email, // Use the provided email from the request
             subject: 'New OTP-Request',
             text: `Your verification code for FoodBankApp Registration is : ${verificationCode}`,
@@ -263,7 +255,7 @@ router.put('/approveUser/:id', async (req, res) => {
             await user.save();
             // Email content
             const mailOptions = {
-                from: 'sovereigntechnology01@gmail.com',
+                from: 'no-reply@sovereigntechltd.com',
                 to: user.email,
                 subject: 'Approval',
                 html: `Hi <p>${user.fullname},</p>
@@ -297,7 +289,7 @@ router.put('/declineUser/:id', async (req, res) => {
         }
         if (user.isApproved === false) {
             const mailOptions = {
-                from: 'sovereigntechnology01@gmail.com',
+                from: 'no-reply@sovereigntechltd.com',
                 to: user.email,
                 subject: 'Rejection',
                 html: `Hi <p>${user.fullname},</p>

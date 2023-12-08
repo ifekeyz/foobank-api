@@ -7,5 +7,7 @@ router.post('/login', driverController.login);
 router.post('/deliveryPickup', driverController.deliveryPickup);
 router.post('/deliveryDropoff', driverController.deliveryDropoff);
 router.get('/getApprovedOrders', driverController.getApprovedOrders);
+router.get('/getDeliveryHistory', driverController.getDeliveryHistory);
+
 
 module.exports = router;

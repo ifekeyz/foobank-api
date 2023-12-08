@@ -9,6 +9,7 @@ const ClientCompany = require('../models/clientCompany');
 const Wallet = require('../models/wallet');
 const Order = require('../models/order')
 const Payment = require('../models/payment')
+const { transporter } = require('../config/config');
 
 const FILE_TYPE_MAP = {
     'image/png': 'png',
@@ -35,15 +36,6 @@ const storage = multer.diskStorage({
 const uploadOptions = multer({ storage: storage })
 
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL
-    auth: {
-        user: 'sovereigntechnology01@gmail.com',
-        pass: 'rqjcpfdszavqbpby'
-    }
-});
 
 router.get('/', async (req, res) => {
     try {
@@ -87,7 +79,7 @@ router.post('/', async (req, res) => {
 
         // Email content
         const mailOptions = {
-            from: 'sovereigntechnology01@gmail.com',
+            from: 'no-reply@sovereigntechltd.com',
             to: req.body.companyEmail,
             subject: 'OTP-Request',
             text: `Your verification code for FoodBankApp Registration is : ${verificationCode}`,
@@ -239,6 +231,96 @@ router.get('/registeredStaff/:companyName', async (req, res) => {
     }
 })
 
+router.get('/registeredStaff/:companyName/:userId', async (req, res) => {
+    try {
+        const{ companyName,userId }= req.params;
+
+        // Find staff members of the specified company
+        const companyStaff = await User.find({ company: companyName, isMember: true,_id:userId },{ passwordHash: 0 } );
+
+        if (companyStaff.length === 0) {
+            return res.status(404).json({message: 'Either company name or user Id is not valid'});
+        }
+
+
+        res.status(200).json(companyStaff);
+    } catch (error) {
+        console.error('Error retrieving company staff:', error);
+        res.status(500).json({ message: 'Error', error: error.message });
+    }
+})
+
+
+router.post('/send-verification-code', async (req, res) => {
+    const { email } = req.body;
+
+    // Generate a 4-digit verification code
+    const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+    const userEmail = await ClientCompany.findOne({companyEmail: email });
+    if (!userEmail) {
+        res.status(400).json({ error: 'Invalid email address' });
+        return;
+    }
+
+    // Email content
+    const mailOptions = {
+        from: 'no-reply@sovereigntechltd.com',
+        to: email,
+        subject: 'FoodLoanBank OTP Code',
+        text: `Your OTP code for reset password is : ${verificationCode}`,
+    };
+
+    try {
+        // Send the email
+        await transporter.sendMail(mailOptions);
+
+        // Update the user with the verification code
+        const user = await ClientCompany.findOneAndUpdate(
+            {companyEmail: email},
+            {verificationCode:verificationCode },
+            { new: true }
+        );
+
+        if (!user) {
+            res.status(400).json({ error: 'User not found' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Verification code sent successfully', id: user._id });
+    } catch (error) {
+        console.error('Error sending verification code:', error);
+        res.status(500).json({ error: `Failed to send verification code ${error}` });
+    }
+});
+
+
+
+
+router.put('/change/password/:id', async (req, res) => {
+    const userExist = await ClientCompany.findById(req.params.id);
+
+    let newPassword
+    if (req.body.password) {
+        newPassword = bcrypt.hashSync(req.body.password, 10)
+    }
+    else {
+        newPassword = userExist.passwordHash;
+
+    }
+    const user = await ClientCompany.findByIdAndUpdate(
+        req.params.id,
+        {
+            companyEmail: req.body.email,
+            passwordHash: bcrypt.hashSync(req.body.password, 10)
+        },
+        { new: true }
+    )
+    if (!user) {
+        return res.status(400).send("The user cannot be created! ")
+    }
+    res.send(user);
+});
+
 router.put('/approveStaff/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -343,7 +425,7 @@ router.get('/loanTransaction/:companyName', async (req, res) => {
 router.get('/staffRequestHistory/:companyName', async (req, res) => {
     try {
         const companyName = req.params.companyName;
-        const companyStaff = await User.find({ company: companyName, companyApprove: true });
+        const companyStaff = await User.find({ company: companyName});
 
         if (!companyStaff) {
             return res.status(201).json([]);

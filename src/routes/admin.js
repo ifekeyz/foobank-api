@@ -7,11 +7,13 @@ const adminController = require('../controllers/Admin');
 const Faq = require('../models/faq');
 const Enquire = require('../models/contact');
 const Wallet = require('../models/wallet');
-const { transporter } = require('../helpers/util');
+// const { transporter } = require('../helpers/util');
 const AdminVat = require('../models/admin');
 const { flutterwavePublicKey } = require('../config/config');
 const ClientCompany = require('../models/clientCompany');
+const Payment = require('../models/payment')
 const router = express.Router();
+const { transporter } = require('../config/config');
 
 
 router.post('/createAdmin', adminController.createAdmin);
@@ -77,7 +79,7 @@ router.put('/approve/:id', async (req, res) => {
 
             // Email content
             const mailOptions = {
-                from: 'sovereigntechnology01@gmail.com',
+                from: 'no-reply@sovereigntechltd.com',
                 to: email,
                 subject: 'Order Approved',
                 text: `Dear ${userInfo.fullname} Your Order with order number ${order.orderNumber} has been approved`,
@@ -366,9 +368,9 @@ router.put('/updateUserLoan/:userId', async(req, res)=>{
 
 router.post('/postPayment', async(req, res)=>{
     try{
-        const { fullName, vat, serviceFee,deliveryFee } = req.body;
+        const { fullName, vat, serviceFee,deliveryFee,interest } = req.body;
 
-        const exitsummary = await AdminVat.findOne({vat,serviceFee,deliveryFee})
+        const exitsummary = await AdminVat.findOne({vat,serviceFee,deliveryFee,interest})
         if(exitsummary){
             return res.status(400).json({ message:"VAT,ServiceFee and DeliveryFees already exist"})
         }
@@ -378,7 +380,8 @@ router.post('/postPayment', async(req, res)=>{
             fullName,
             vat, 
             serviceFee,
-            deliveryFee
+            deliveryFee,
+            interest
         });
 
         // Save the new staff member to the database
@@ -407,6 +410,91 @@ router.get('/getPaymentChargesSummary', async (req, res) => {
 router.get('/flutterwave-public-key', (req, res) => {
     res.json({ publicKey: flutterwavePublicKey });
 });
+
+
+router.get('/getAllCurrentLoan', async (req, res) => {
+    try {
+        const totalLoanAggregate = await Wallet.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalLoan: { $sum: '$currentLoan' }
+                }
+            }
+        ]);
+
+        // Extract the totalLoan from the aggregation result
+        const totalLoan = totalLoanAggregate.length > 0 ? totalLoanAggregate[0].totalLoan : 0;
+
+        res.status(200).json({ totalLoan });
+    } catch (error) {
+        console.error('Error calculating total loan:', error);
+        res.status(500).json({ message: 'Error', error: error.message });
+    }
+});
+
+
+router.get('/getAllPaidLoan', async (req, res) => {
+    try {
+        const totalLoanAggregate = await Wallet.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalLoan: { $sum: '$paidLoan' }
+                }
+            }
+        ]);
+
+        // Extract the totalLoan from the aggregation result
+        const totalLoan = totalLoanAggregate.length > 0 ? totalLoanAggregate[0].totalLoan : 0;
+
+        res.status(200).json({ totalLoan });
+    } catch (error) {
+        console.error('Error calculating total loan:', error);
+        res.status(500).json({ message: 'Error', error: error.message });
+    }
+});
+
+
+
+router.get('/getAllCompanyPayment', async (req, res) => {
+    try {
+        // Retrieve all orders
+        const paymentCharges = await Payment.find();
+
+        return res.status(200).json(paymentCharges);
+    } catch (error) {
+        console.error('Error retrieving paymentCharges:', error);
+        res.status(500).json({ message: 'Error', error: error.message });
+    }
+});
+
+
+router.put('/approveCompanyPayment/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const order = await Payment.findById(id);
+
+        if (!order) {
+            return res.status(400).json({ message: 'payment not found' });
+        }
+
+        // Check if the order is in a state where it can be accepted
+        if (order.isApproved === false) {
+            // Update the order isApproved to 'approved' or 'accepted'
+            order.isApproved = true;
+            await order.save();
+
+            return res.status(200).json({ message: 'Payment approve successfully' });
+        } else {
+            return res.status(400).json({ message: 'Order cannot be declined in its current state' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error', error: error.message });
+    }
+});
+
 
 
 module.exports = router;
