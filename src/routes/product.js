@@ -1,6 +1,6 @@
 const express = require('express');
 const productController = require('../controllers/Product');
-const Product = require('../models/product'); // Import the Product model
+const Product = require('../models/product');
 const multer = require('multer');
 const router = express.Router();
 
