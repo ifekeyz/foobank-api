@@ -51,7 +51,7 @@ router.put('/approve/:id', async (req, res) => {
             return res.status(400).json({ message: 'User wallet not found on order' });
         }
         else {
-            if (wallet.totalLoan === 0 && wallet.currentLoan === 0) {
+            if (wallet.totalLoan === wallet.currentLoan) {
                 wallet.balance -= allItemsTotalPrice
                 wallet.totalLoan += allItemsTotalPrice
                 currentAmountLeft = wallet.paidLoan
@@ -59,7 +59,7 @@ router.put('/approve/:id', async (req, res) => {
                 currentLoanData = wallet.currentLoan
                 wallet.montlyPayBack = currentLoanData / 3
 
-                await wallet.save();
+                // await wallet.save();
 
                 const orders = await Order.find({ userId });
 
@@ -86,7 +86,6 @@ router.put('/approve/:id', async (req, res) => {
                         from: 'no-reply@sovereigntechltd.com',
                         to: email,
                         subject: 'Order Approved',
-                        text: `Dear ${userInfo.fullname} Your Order with order number ${order.orderNumber} has been approved`,
                         html: `
                         <main>
                             <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
@@ -104,7 +103,7 @@ router.put('/approve/:id', async (req, res) => {
                         `
                     };
 
-                    await transporter.sendMail(mailOptions);
+                    // await transporter.sendMail(mailOptions);
                     await wallet.save();
                     await order.save();
 
@@ -121,7 +120,7 @@ router.put('/approve/:id', async (req, res) => {
                 wallet.montlyPayBack = currentLoanData / 3
                 wallet.paidLoan = 0
 
-                await wallet.save();
+                // await wallet.save();
 
                 const orders = await Order.find({ userId });
 
@@ -148,7 +147,6 @@ router.put('/approve/:id', async (req, res) => {
                         from: 'no-reply@sovereigntechltd.com',
                         to: email,
                         subject: 'Order Approved',
-                        text: `Dear ${userInfo.fullname} Your Order with order number ${order.orderNumber} has been approved`,
                         html: `
                         <main>
                             <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
