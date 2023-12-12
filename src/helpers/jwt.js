@@ -58,6 +58,8 @@ function authJwt(){
             {url:/\/api\/v1\/driver\/getDeliveryHistory(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/company\/send-verification-code(.*)/,methods:['POST','OPTIONS']},
             {url:/\/api\/v1\/company\/change\/password(.*)/,methods:['PUT','OPTIONS']},
+            {url:/\/public\/uploads(.*)/,methods:['GET','OPTIONS']},
+            {url:/\/uploads(.*)/,methods:['GET','OPTIONS']},
             
 
         ]
