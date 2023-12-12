@@ -48,6 +48,8 @@ router.post('/createProduct', uploadOptions.single('image'), async (req, res) =>
             image: `${basepath}${fileName}`,
         });
 
+        console.log(newProduct)
+
         const savedProduct = await newProduct.save();
 
         res.status(201).json(savedProduct);
