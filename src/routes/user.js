@@ -352,7 +352,7 @@ router.put('/declineUser/:id', async (req, res) => {
                 from: 'no-reply@sovereigntechltd.com',
                 to: user.email,
                 subject: 'Rejection',
-                html: `Hi <p>${user.fullname},</p>
+                html: `Hi <p>${user.fullname} well done,</p>
            <p>Your registration was not successful due to the following reasons kindly revert back to the email below.</p>
            <p>${reason}</p>
            <p>Regards,</p>
