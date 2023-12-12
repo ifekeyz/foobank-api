@@ -19,9 +19,9 @@ const config = {
 }
 
 const transporter = nodemailer.createTransport({
-    host: 'mail.sovereigntechltd.com',
-    port: 25,
-    secure: false, // Use TLS
+    host: 'smtp.sovereigntechltd.com',
+    // port: 25,
+    secure: true, // Use TLS
     auth: {
       user: 'no-reply@sovereigntechltd.com',
       pass: 'AV2eTCHC'
