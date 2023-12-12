@@ -50,48 +50,131 @@ router.put('/approve/:id', async (req, res) => {
         if (!wallet) {
             return res.status(400).json({ message: 'User wallet not found on order' });
         }
-        wallet.balance -= allItemsTotalPrice
-        wallet.currentLoan += allItemsTotalPrice
-        currentLoanData = wallet.currentLoan
-        wallet.montlyPayBack = currentLoanData / 3
+        else {
+            if (wallet.totalLoan === 0 && wallet.currentLoan === 0) {
+                wallet.balance -= allItemsTotalPrice
+                wallet.totalLoan += allItemsTotalPrice
+                currentAmountLeft = wallet.paidLoan
+                wallet.currentLoan += allItemsTotalPrice
+                currentLoanData = wallet.currentLoan
+                wallet.montlyPayBack = currentLoanData / 3
 
-        await wallet.save();
+                await wallet.save();
 
-        const orders = await Order.find({ userId });
+                const orders = await Order.find({ userId });
 
-        if (!orders || orders.length === 0) {
-            return res.status(404).json({ message: 'No orders found for the user' });
-        }
+                if (!orders || orders.length === 0) {
+                    return res.status(404).json({ message: 'No orders found for the user' });
+                }
 
-        // Calculate the sum of allItemsTotalPrice across all orders
-        const totalAllItemsTotalPrice = orders.reduce((total, order) => total + order.allItemsTotalPrice, 0);
-        wallet.totalLoan = totalAllItemsTotalPrice
+                // Calculate the sum of allItemsTotalPrice across all orders
+                // const totalAllItemsTotalPrice = orders.reduce((total, order) => total + order.allItemsTotalPrice, 0);
+                // wallet.totalLoan += totalAllItemsTotalPrice
 
-        const userInfo = await User.findOne({ _id: userId })
+                const userInfo = await User.findOne({ _id: userId })
 
-        const email = userInfo.email
-        // Check if the order is in a state where it can be accepted
-        if (order.status === 'pending') {
-            // Update the order status to 'approved' or 'accepted'
-            order.status = 'approved';
-            const randomOrderNumber = Math.floor(100000 + Math.random() * 900000);
-            order.orderNumber = `#${randomOrderNumber}`;
+                const email = userInfo.email
+                // Check if the order is in a state where it can be accepted
+                if (order.status === 'pending') {
+                    // Update the order status to 'approved' or 'accepted'
+                    order.status = 'approved';
+                    const randomOrderNumber = Math.floor(100000 + Math.random() * 900000);
+                    order.orderNumber = `#${randomOrderNumber}`;
 
-            // Email content
-            const mailOptions = {
-                from: 'no-reply@sovereigntechltd.com',
-                to: email,
-                subject: 'Order Approved',
-                text: `Dear ${userInfo.fullname} Your Order with order number ${order.orderNumber} has been approved`,
-            };
+                    // Email content
+                    const mailOptions = {
+                        from: 'no-reply@sovereigntechltd.com',
+                        to: email,
+                        subject: 'Order Approved',
+                        text: `Dear ${userInfo.fullname} Your Order with order number ${order.orderNumber} has been approved`,
+                        html: `
+                        <main>
+                            <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
+                                <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
+                            </div>
+                            <h2>Hello ${userInfo.fullname},</h2>
+                            <p>Your Order with order number
+                                <span style="background-color: #008B50; padding: 3px; border-radius: 2px; color: white;">${order.orderNumber}</span> has been approved.
+                            </p>
+                            
+                            <p>Kindly, be on a look for a delivery.</p>
+                            <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>
+                                <p>©️ 2023 Sovereigntechltd. All rights reserved.</p>
+                        </main>
+                        `
+                    };
 
-            await transporter.sendMail(mailOptions);
-            await wallet.save();
-            await order.save();
+                    await transporter.sendMail(mailOptions);
+                    await wallet.save();
+                    await order.save();
 
-            return res.status(200).json({ message: 'Order accepted successfully' });
-        } else {
-            return res.status(400).json({ message: 'Order cannot be accepted in its current state' });
+                    return res.status(200).json({ message: 'Order accepted successfully' });
+                } else {
+                    return res.status(400).json({ message: 'Order cannot be accepted in its current state' });
+                }
+            } else if( wallet.currentLoan != wallet.totalLoan) {
+                wallet.balance -= allItemsTotalPrice
+                wallet.totalLoan += allItemsTotalPrice
+                currentAmountLeft = wallet.currentLoan - wallet.paidLoan
+                wallet.currentLoan = allItemsTotalPrice + currentAmountLeft
+                currentLoanData = wallet.currentLoan
+                wallet.montlyPayBack = currentLoanData / 3
+                wallet.paidLoan = 0
+
+                await wallet.save();
+
+                const orders = await Order.find({ userId });
+
+                if (!orders || orders.length === 0) {
+                    return res.status(404).json({ message: 'No orders found for the user' });
+                }
+
+                // Calculate the sum of allItemsTotalPrice across all orders
+                // const totalAllItemsTotalPrice = orders.reduce((total, order) => total + order.allItemsTotalPrice, 0);
+                // wallet.totalLoan += totalAllItemsTotalPrice
+
+                const userInfo = await User.findOne({ _id: userId })
+
+                const email = userInfo.email
+                // Check if the order is in a state where it can be accepted
+                if (order.status === 'pending') {
+                    // Update the order status to 'approved' or 'accepted'
+                    order.status = 'approved';
+                    const randomOrderNumber = Math.floor(100000 + Math.random() * 900000);
+                    order.orderNumber = `#${randomOrderNumber}`;
+
+                    // Email content
+                    const mailOptions = {
+                        from: 'no-reply@sovereigntechltd.com',
+                        to: email,
+                        subject: 'Order Approved',
+                        text: `Dear ${userInfo.fullname} Your Order with order number ${order.orderNumber} has been approved`,
+                        html: `
+                        <main>
+                            <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
+                                <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
+                            </div>
+                            <h2>Hello ${userInfo.fullname},</h2>
+                            <p>Your Order with order number
+                                <span style="background-color: #008B50; padding: 3px; border-radius: 2px; color: white;">${order.orderNumber}</span> has been approved.
+                            </p>
+                            
+                            <p>Kindly, be on a look for a delivery.</p>
+                            <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>
+                                <p>©️ 2023 Sovereigntechltd. All rights reserved.</p>
+                        </main>
+                        `
+                    };
+
+                    await transporter.sendMail(mailOptions);
+                    await wallet.save();
+                    await order.save();
+
+                    return res.status(200).json({ message: 'Order accepted successfully' });
+                } else {
+                    return res.status(400).json({ message: 'Order cannot be accepted in its current state' });
+                }
+            }
         }
     } catch (error) {
         res.status(500).json({ message: 'Error', error: error.message });
@@ -272,17 +355,17 @@ router.get('/getCompanyStaff', async (req, res) => {
 })
 
 
-router.get('/singleCompany/:id', async(req,res)=>{
-    try{
+router.get('/singleCompany/:id', async (req, res) => {
+    try {
         const { id } = req.params;
 
         const company = await Company.findById(id);
-        if (!company){
-            res.status(400).json({ message: 'Company Id not found',  });
+        if (!company) {
+            res.status(400).json({ message: 'Company Id not found', });
         }
 
         res.status(200).json(company);
-    }catch{
+    } catch {
         res.status(500).json({ message: 'Error', error: error.message });
     }
 })
@@ -339,20 +422,20 @@ router.get('/getTotalLoanByCompany/:companyName', async (req, res) => {
     }
 });
 
-router.put('/updateUserLoan/:userId', async(req, res)=>{
-    try{
-        const {userId} =req.params
+router.put('/updateUserLoan/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params
         const paidLoan = req.body.paidLoan
 
-        const user = await Order.find({userId})
-        if(!user){
-            return res.status(400).json({message:"No user found in the Order"})
+        const user = await Order.find({ userId })
+        if (!user) {
+            return res.status(400).json({ message: "No user found in the Order" })
         }
-        const wallet = await Wallet.findOne({userId:userId})
-        
+        const wallet = await Wallet.findOne({ userId: userId })
+
         // Calculate the sum of allItemsTotalPrice across all orders
         const totalAllItemsTotalPrice = user.reduce((total, order) => total + order.allItemsTotalPrice, 0);
-        console.log(totalAllItemsTotalPrice)
+
 
         // wallet.totalLoan -= paidLoan
         wallet.paidLoan += paidLoan
@@ -360,25 +443,25 @@ router.put('/updateUserLoan/:userId', async(req, res)=>{
         await wallet.save();
 
         res.status(200).json({ wallet, message: "Outstanding loan updated correctly" });
-    }catch(error){
+    } catch (error) {
         res.status(500).json({ message: 'Error', error: error.message });
     }
 
 })
 
-router.post('/postPayment', async(req, res)=>{
-    try{
-        const { fullName, vat, serviceFee,deliveryFee,interest } = req.body;
+router.post('/postPayment', async (req, res) => {
+    try {
+        const { fullName, vat, serviceFee, deliveryFee, interest } = req.body;
 
-        const exitsummary = await AdminVat.findOne({vat,serviceFee,deliveryFee,interest})
-        if(exitsummary){
-            return res.status(400).json({ message:"VAT,ServiceFee and DeliveryFees already exist"})
+        const exitsummary = await AdminVat.findOne({ vat, serviceFee, deliveryFee, interest })
+        if (exitsummary) {
+            return res.status(400).json({ message: "VAT,ServiceFee and DeliveryFees already exist" })
         }
 
         // Create a new staff member
         const newPayment = new AdminVat({
             fullName,
-            vat, 
+            vat,
             serviceFee,
             deliveryFee,
             interest
@@ -389,8 +472,8 @@ router.post('/postPayment', async(req, res)=>{
 
         // Return the saved staff member with a 201 Created status
         return res.status(200).json(savedPayment);
-    }catch(error){
-        res.status(500).json({message:"Error", error:error.message})
+    } catch (error) {
+        res.status(500).json({ message: "Error", error: error.message })
     }
 })
 
@@ -410,7 +493,6 @@ router.get('/getPaymentChargesSummary', async (req, res) => {
 router.get('/flutterwave-public-key', (req, res) => {
     res.json({ publicKey: flutterwavePublicKey });
 });
-
 
 router.get('/getAllCurrentLoan', async (req, res) => {
     try {
@@ -455,8 +537,6 @@ router.get('/getAllPaidLoan', async (req, res) => {
     }
 });
 
-
-
 router.get('/getAllCompanyPayment', async (req, res) => {
     try {
         // Retrieve all orders
@@ -469,26 +549,45 @@ router.get('/getAllCompanyPayment', async (req, res) => {
     }
 });
 
-
 router.put('/approveCompanyPayment/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
-        const order = await Payment.findById(id);
+        const payment = await Payment.findById(id);
+        const companyName = payment.companyName
 
-        if (!order) {
-            return res.status(400).json({ message: 'payment not found' });
+        if (!payment) {
+            return res.status(400).json({ message: 'company payment not found' });
+        }
+        const users = await User.find({ company: companyName });
+
+        if (users.length === 0) {
+            return res.status(404).json([]);
         }
 
-        // Check if the order is in a state where it can be accepted
-        if (order.isApproved === false) {
-            // Update the order isApproved to 'approved' or 'accepted'
-            order.isApproved = true;
-            await order.save();
+        // Calculate the total loan for all users with the same company name
+        // let paidLoanAmount = 0;
+        for (const user of users) {
+            const wallet = await Wallet.findOne({ userId: user._id });
+            if (wallet) {
+
+                paidLoanAmount = wallet.montlyPayBack;
+                wallet.paidLoan += paidLoanAmount
+                wallet.currentPaidLoan += paidLoanAmount
+                await wallet.save()
+            }
+
+        }
+
+        // Check if the payment is in a state where it can be accepted
+        if (payment.isApproved === false) {
+            // Update the payment isApproved to 'approved' or 'accepted'
+            payment.isApproved = true;
+            await payment.save();
 
             return res.status(200).json({ message: 'Payment approve successfully' });
         } else {
-            return res.status(400).json({ message: 'Order cannot be declined in its current state' });
+            return res.status(400).json({ message: 'Payment already verified. Thanks' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error', error: error.message });

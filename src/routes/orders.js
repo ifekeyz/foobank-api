@@ -45,7 +45,7 @@ router.post('/createOrder', async (req, res) => {
     if (!wallet) {
       return res.status(404).json({ message: 'Wallet not found for the user' });
     } else {
-      if (wallet.paidLoan > wallet.montlyPayBack) {
+      if (wallet.currentPaidLoan > wallet.montlyPayBack) {
         // Create a new order with delivery details
         const newOrder = new Order({
           userId,
@@ -65,7 +65,7 @@ router.post('/createOrder', async (req, res) => {
 
         // Clear the user's cart since items have been ordered
         cart.items = [];
-        wallet.paidLoan = 0;
+        wallet.currentPaidLoan = 0;
         await wallet.save();
         await cart.save();
 
@@ -91,7 +91,7 @@ router.post('/createOrder', async (req, res) => {
 
         // Clear the user's cart since items have been ordered
         cart.items = [];
-        wallet.paidLoan = 0;
+        wallet.currentPaidLoan = 0;
         await wallet.save();
         await cart.save();
 

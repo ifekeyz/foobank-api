@@ -4,9 +4,8 @@ const walletSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   totalLoan: { type: Number, required: true },
   paidLoan: { type: Number, required: true },
-  balance:{
-    type:Number
-  },
+  currentPaidLoan:{type:Number},
+  balance:{ type:Number },
   currentLoan:{type:Number},
   montlyPayBack:{type:Number},
 });

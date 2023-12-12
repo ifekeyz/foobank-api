@@ -384,7 +384,7 @@ router.put('/declineStaff/:id', async (req, res) => {
 
             await transporter.sendMail(mailOptions);
 
-            return res.status(200).json({ message: 'User approved successfully' });
+            return res.status(200).json({ message: 'User disapproved successfully' });
         } else {
             return res.status(400).json({ message: 'User cannot be accepted in its current state' });
         }

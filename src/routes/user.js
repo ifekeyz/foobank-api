@@ -7,6 +7,32 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const { transporter } = require('../config/config');
 
+
+
+// const multerStorage = multer.memoryStorage();
+
+// const multerFilter = (req, file, cb) => {
+//   if (file.mimetype.startsWith('image')) {
+//     cb(null, true);
+//   } else {
+//     cb(new AppError('Not an image! Please upload only images.', 400), false);
+//   }
+// };
+
+// const upload = multer({
+//     storage: multerStorage,
+//     fileFilter: multerFilter
+//   });
+
+//   exports.uploadTourImages = upload.fields([
+//     { name: 'imageCover', maxCount: 1 },
+//     { name: 'images', maxCount: 3 }
+//   ]);
+  
+  
+  // Serving static files
+  
+
 const FILE_TYPE_MAP = {
     'image/png': 'png',
     'image/jpeg': 'jpeg',
@@ -21,7 +47,7 @@ const storage = multer.diskStorage({
         if (isValid) {
             uploadError = null
         }
-        cb(uploadError, 'public/uploads')
+        cb(uploadError, '/public/uploads')
     },
     filename: function (req, file, cb) {
         const fileName = file.originalname.split(' ').join('-');
@@ -164,6 +190,7 @@ router.put('/:userId', uploadOptions.single('image'), async (req, res) => {
         if (!file) { return res.status(400).send("No image in the request") }
         const fileName = req.file.filename
         const basepath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        console.log(basepath)
 
         const user = await User.findById(userId);
 

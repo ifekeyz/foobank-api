@@ -9,11 +9,13 @@ const helmet = require('helmet');
 const morgan = require('morgan')
 const authJwt = require('./helpers/jwt');
 const errorHandler = require('./helpers/error-handler');
+const path = require('path');
 
 dotenv.config();
 
 const app = express();
-
+app.use('/public', express.static('public'));
+// app.use(express.static(path.join(__dirname, 'public/uploads')))
 app.use(cors({ origin: "*" }))
 app.use(express.urlencoded({ extended: true }))
 

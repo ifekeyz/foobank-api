@@ -17,7 +17,7 @@ const start = async () => {
         });
 
     } catch (error) {
-        console.log('Unable to connect')
+        console.log('Unable to connect', error)
         console.log(error)
         process.exit(1);
     }

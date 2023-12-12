@@ -11,11 +11,14 @@ function authJwt(){
         isRevoked:isRevoked
     }).unless({
         path:[
+            `/`,
+            `/public/uploads/(.*)`,
             `${api}/users/login`,
             `${api}/users/register`,
             `${api}/users/(.*)`,
             `${api}/users/change/password/(.*)`,
             `${api}/user/verify-code`,
+            {url:/\/public\/uploads(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/users\/change\/password(.*)/,methods:['POST','OPTIONS']},
             {url:/\/api\/v1\/users(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/users(.*)/,methods:['POST','OPTIONS']},

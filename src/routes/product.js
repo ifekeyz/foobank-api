@@ -29,7 +29,7 @@ const storage = multer.diskStorage({
     }
 })
 
-const uploadOptions = multer({ storage: storage })
+const uploadOptions = multer({storage })
 
 router.post('/createProduct', uploadOptions.single('image'), async (req, res) => {
     try {
