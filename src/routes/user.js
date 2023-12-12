@@ -47,7 +47,7 @@ const storage = multer.diskStorage({
         if (isValid) {
             uploadError = null
         }
-        cb(uploadError, '/public/uploads')
+        cb(uploadError, 'src/public/uploads')
     },
     filename: function (req, file, cb) {
         const fileName = file.originalname.split(' ').join('-');
@@ -115,7 +115,28 @@ router.post('/', async (req, res) => {
             from: 'no-reply@sovereigntechltd.com',
             to: req.body.email, // Use the provided email from the request
             subject: 'OTP-Request',
-            text: `Your verification code for FoodBankApp Registration is : ${verificationCode}`,
+            html:`
+            <main>
+            <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
+                <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
+            </div>
+            <h2>Hello,</h2>
+            <p>You can complete your 
+                <span style="background-color: #008B50; padding: 3px; border-radius: 2px; color: white;">FoodBankApp</span> registration with the OTP below.
+            </p>
+            <div style="text-align: center; ">
+                <h1>
+                <span style="color: #008B50; text-align: center;">One Time Password (OTP)${verificationCode}</span>
+                </h1>
+                </div>
+                <div style='text-align: center;  '>
+                    <h1 style="background-color: #f4f4f4; padding: 8px; text-align: center; border-radius: 5px; margin: 0 50px  ">6 7 8 9</h1>
+            </div>
+            <p>This code expires in x minutes. Do not click any links or share with any body.</p>
+            <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>
+                <p>©️ 2023 Sovereigntechltd. All rights reserved.</p>
+            </main>
+            `
         };
 
         await transporter.sendMail(mailOptions);
@@ -189,7 +210,7 @@ router.put('/:userId', uploadOptions.single('image'), async (req, res) => {
         const file = req.file;
         if (!file) { return res.status(400).send("No image in the request") }
         const fileName = req.file.filename
-        const basepath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        const basepath = `${req.protocol}://${req.get('host')}/uploads/`;
         console.log(basepath)
 
         const user = await User.findById(userId);
