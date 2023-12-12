@@ -285,11 +285,23 @@ router.put('/approveUser/:id', async (req, res) => {
                 from: 'no-reply@sovereigntechltd.com',
                 to: user.email,
                 subject: 'Approval',
-                html: `Hi <p>${user.fullname},</p>
-           <p>Congratulations! We have approved your registration with us. You can now log in to make a one-time registration fee payment and explore our great offers.</p>
-           <p>We want you to know that the aim of this is to simplify the burden, and we have got this right with you.</p>
-           <p>Regards,</p>
-           <p>Team FoodBank.</p>`
+                html:`
+                <main>
+                    <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
+                        <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
+                    </div>
+                    <h2>Hello ${user.fullname},</h2>
+                    <p>
+                        <span style="background-color: #008B50; padding: 3px; border-radius: 2px; color: white;">Congratulations!</span> We have approved your registration with us. 
+                        You can now log in to make a one-time registration fee payment and explore our great offers
+                    </p>
+                    <p>We want you to know that the aim of this is to simplify the burden, and we have got this right with you.</p>
+                    
+                    <p>This code expires in x minutes. Do not click any links or share with any body.</p>
+                    <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>
+                        <p>©️ 2023 Sovereigntechltd. All rights reserved.</p>
+                </main>
+                    `
             };
 
             await transporter.sendMail(mailOptions);

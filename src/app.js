@@ -15,7 +15,6 @@ dotenv.config();
 
 const app = express();
 app.use('/public', express.static('public'));
-// app.use(express.static(path.join(__dirname, 'public/uploads')))
 app.use(cors({ origin: "*" }))
 app.use(express.urlencoded({ extended: true }))
 
