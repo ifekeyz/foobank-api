@@ -36,7 +36,7 @@ router.post('/createProduct', uploadOptions.single('image'), async (req, res) =>
         const file = req.file;
         if (!file) { return res.status(400).send("No image in the request") }
         const fileName = req.file.filename
-        const basepath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        const basepath = `${req.protocol}://${req.get('host')}/uploads/`;
         const { name, measurement, type, price,quantity } = req.body;
 
         const newProduct = new Product({
@@ -47,8 +47,6 @@ router.post('/createProduct', uploadOptions.single('image'), async (req, res) =>
             quantity: quantity,
             image: `${basepath}${fileName}`,
         });
-
-        console.log(newProduct)
 
         const savedProduct = await newProduct.save();
 
