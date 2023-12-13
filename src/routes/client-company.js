@@ -164,7 +164,7 @@ router.post('/login', async (req, res) => {
                 isAdmin: user.isApproved
             },
             secret,
-            { expiresIn: '5m' }
+            { expiresIn: '1d' }
         )
         res.status(200).send({ user, token: token })
     }
@@ -267,6 +267,7 @@ router.post('/send-verification-code', async (req, res) => {
         from: 'no-reply@sovereigntechltd.com',
         to: email,
         subject: 'FoodLoanBank OTP Code',
+        
         text: `Your OTP code for reset password is : ${verificationCode}`,
     };
 

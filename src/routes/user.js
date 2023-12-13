@@ -126,11 +126,11 @@ router.post('/', async (req, res) => {
             </p>
             <div style="text-align: center; ">
                 <h1>
-                <span style="color: #008B50; text-align: center;">One Time Password (OTP)${verificationCode}</span>
+                <span style="color: #008B50; text-align: center;">One Time Password (OTP)</span>
                 </h1>
                 </div>
                 <div style='text-align: center;  '>
-                    <h1 style="background-color: #f4f4f4; padding: 8px; text-align: center; border-radius: 5px; margin: 0 50px  ">6 7 8 9</h1>
+                    <h1 style="background-color: #f4f4f4; padding: 8px; text-align: center; border-radius: 5px; margin: 0 50px  ">${verificationCode}</h1>
             </div>
             <p>This code expires in x minutes. Do not click any links or share with any body.</p>
             <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>

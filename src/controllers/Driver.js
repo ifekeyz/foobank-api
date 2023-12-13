@@ -73,6 +73,7 @@ const deliveryPickup = async (req, res) => {
       return res.status(500).json({ message: "Opps! User does not exist" })
     }
     const userEmail = userExists.email
+    const userName = userExists.fullname
 
     const order = await Order.findById(orderId)
 
@@ -85,7 +86,28 @@ const deliveryPickup = async (req, res) => {
       from: 'no-reply@sovereigntechltd.com',
       to: userEmail,
       subject: 'Order OTP-Request',
-      text: `Your verification code for FoodBank Order is : ${otp}`,
+      html:`
+            <main>
+            <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
+                <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
+            </div>
+            <h2>Hello, ${userName}</h2>
+            <p>Your FoodBank order is on it way. The driver wil ask for this code
+            </p>
+            <div style="text-align: center; ">
+                <h1>
+                <span style="color: #008B50; text-align: center;">One Time Password (OTP)</span>
+                </h1>
+                </div>
+                <div style='text-align: center;  '>
+                    <h1 style="background-color: #f4f4f4; padding: 8px; text-align: center; border-radius: 5px; margin: 0 50px">${otp}</h1>
+            </div>
+            <p>Kindly provide it to him on delivery</p>
+            
+            <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>
+                <p>©️ 2023 Sovereigntechltd. All rights reserved.</p>
+            </main>
+            `,
     };
 
     await transporter.sendMail(mailOptions);
