@@ -2,41 +2,70 @@ const express = require('express');
 const productController = require('../controllers/Product');
 const Product = require('../models/product');
 const multer = require('multer');
+// const { storage } = require("../cloudinary");
+
 const router = express.Router();
 
 
 
-const FILE_TYPE_MAP = {
-    'image/png': 'png',
-    'image/jpeg': 'jpeg',
-    'image/jpg': 'jpg'
+const {CloudinaryStorage} = require('multer-storage-cloudinary')
+const cloudinary = require('cloudinary').v2
+const dotenv = require('dotenv')
+
+
+dotenv.config()
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+});
+
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: 'foodBank',
+        // allowedFormats: ['pdf', 'docx', 'doc', 'txt']
+    }
+});
+const upload = multer({ storage: storage });
+
+module.exports = {
+    cloudinary,
+    storage
 }
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const isValid = FILE_TYPE_MAP[file.mimetype];
-        let uploadError = new Error('invalid image type');
+// const FILE_TYPE_MAP = {
+//     'image/png': 'png',
+//     'image/jpeg': 'jpeg',
+//     'image/jpg': 'jpg'
+// }
 
-        if (isValid) {
-            uploadError = null
-        }
-        cb(uploadError, 'public/uploads')
-    },
-    filename: function (req, file, cb) {
-        const fileName = file.originalname.split(' ').join('-');
-        const extension = FILE_TYPE_MAP[file.mimetype];
-        cb(null, `${fileName}-${Date.now()}.${extension}`)
-    }
-})
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         const isValid = FILE_TYPE_MAP[file.mimetype];
+//         let uploadError = new Error('invalid image type');
 
-const uploadOptions = multer({storage })
+//         if (isValid) {
+//             uploadError = null
+//         }
+//         cb(uploadError, 'public/uploads')
+//     },
+//     filename: function (req, file, cb) {
+//         const fileName = file.originalname.split(' ').join('-');
+//         const extension = FILE_TYPE_MAP[file.mimetype];
+//         cb(null, `${fileName}-${Date.now()}.${extension}`)
+//     }
+// })
 
-router.post('/createProduct', uploadOptions.single('image'), async (req, res) => {
+// const uploadOptions = multer({storage })
+
+router.post('/createProduct', upload.single('image'), async (req, res) => {
     try {
         const file = req.file;
         if (!file) { return res.status(400).send("No image in the request") }
-        const fileName = req.file.filename
-        const basepath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        const fileName = req.file.path
+        // const basepath = `${req.protocol}://${req.get('host')}/public/uploads/`;
         const { name, measurement, type, price,quantity } = req.body;
 
         const newProduct = new Product({
@@ -45,10 +74,11 @@ router.post('/createProduct', uploadOptions.single('image'), async (req, res) =>
             type: type,
             price: price,
             quantity: quantity,
-            image: `${basepath}${fileName}`,
+            image: fileName,
         });
 
         const savedProduct = await newProduct.save();
+        console.log(fileName)
 
         res.status(201).json(savedProduct);
     } catch (error) {
