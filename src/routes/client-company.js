@@ -457,15 +457,14 @@ router.get('/staffRequestHistory/:companyName', async (req, res) => {
     }
 });
 
-router.post('/companyPayment/:companyName', uploadOptions.single('image'), async (req, res) => {
+router.post('/companyPayment/:companyName', upload.single('image'), async (req, res) => {
     try {
         const companyName = req.params.companyName;
         const amountPaid = req.body.amountPaid;
 
         const file = req.file;
         if (!file) { return res.status(400).send("No image in the request") }
-        const fileName = req.file.filename
-        const basepath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        const fileName = req.file.path;
 
         const companyStaff = await ClientCompany.find({ companyName: companyName });
 
@@ -483,7 +482,7 @@ router.post('/companyPayment/:companyName', uploadOptions.single('image'), async
             companyName: companyName,
             month: currentMonth,
             year: currentYear,
-            transactionReceipt: `${basepath}${fileName}`
+            transactionReceipt: fileName
         })
         const savePayment = await newPayment.save();
 
