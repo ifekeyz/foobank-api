@@ -78,7 +78,7 @@ router.post('/createProduct', upload.single('image'), async (req, res) => {
         });
 
         const savedProduct = await newProduct.save();
-        console.log(fileName)
+        
 
         res.status(201).json(savedProduct);
     } catch (error) {
