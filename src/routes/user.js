@@ -9,55 +9,57 @@ const { transporter } = require('../config/config');
 
 
 
-// const multerStorage = multer.memoryStorage();
+// const FILE_TYPE_MAP = {
+//     'image/png': 'png',
+//     'image/jpeg': 'jpeg',
+//     'image/jpg': 'jpg'
+// }
 
-// const multerFilter = (req, file, cb) => {
-//   if (file.mimetype.startsWith('image')) {
-//     cb(null, true);
-//   } else {
-//     cb(new AppError('Not an image! Please upload only images.', 400), false);
-//   }
-// };
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         const isValid = FILE_TYPE_MAP[file.mimetype];
+//         let uploadError = new Error('invalid image type');
 
-// const upload = multer({
-//     storage: multerStorage,
-//     fileFilter: multerFilter
-//   });
+//         if (isValid) {
+//             uploadError = null
+//         }
+//         cb(uploadError, 'public/uploads')
+//     },
+//     filename: function (req, file, cb) {
+//         const fileName = file.originalname.split(' ').join('-');
+//         const extension = FILE_TYPE_MAP[file.mimetype];
+//         cb(null, `${fileName}-${Date.now()}.${extension}`)
+//     }
+// })
+// const uploadOptions = multer({ storage: storage })
 
-//   exports.uploadTourImages = upload.fields([
-//     { name: 'imageCover', maxCount: 1 },
-//     { name: 'images', maxCount: 3 }
-//   ]);
-  
-  
-  // Serving static files
-  
 
-const FILE_TYPE_MAP = {
-    'image/png': 'png',
-    'image/jpeg': 'jpeg',
-    'image/jpg': 'jpg'
-}
+const { CloudinaryStorage } = require('multer-storage-cloudinary')
+const cloudinary = require('cloudinary').v2
+const dotenv = require('dotenv')
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const isValid = FILE_TYPE_MAP[file.mimetype];
-        let uploadError = new Error('invalid image type');
 
-        if (isValid) {
-            uploadError = null
-        }
-        cb(uploadError, 'public/uploads')
-    },
-    filename: function (req, file, cb) {
-        const fileName = file.originalname.split(' ').join('-');
-        const extension = FILE_TYPE_MAP[file.mimetype];
-        cb(null, `${fileName}-${Date.now()}.${extension}`)
+dotenv.config()
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+});
+
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: 'foodBank',
+        // allowedFormats: ['pdf', 'docx', 'doc', 'txt']
     }
-})
-const uploadOptions = multer({ storage: storage })
+});
+const upload = multer({ storage: storage });
 
-
+module.exports = {
+    cloudinary,
+    storage
+}
 
 
 router.get('/', async (req, res) => {
@@ -115,7 +117,7 @@ router.post('/', async (req, res) => {
             from: 'no-reply@sovereigntechltd.com',
             to: req.body.email, // Use the provided email from the request
             subject: 'OTP-Request',
-            html:`
+            html: `
             <main>
             <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
                 <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
@@ -152,7 +154,7 @@ router.put('/resend-mail', async (req, res) => {
     try {
 
         const email = req.body.email
-        const user = await User.findOne({email});
+        const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(404).json({ message: "User with company email address not found 1" });
@@ -203,15 +205,13 @@ router.post('/register', async (req, res) => {
 
 
 
-router.put('/:userId', uploadOptions.single('image'), async (req, res) => {
+router.put('/:userId', upload.single('image'), async (req, res) => {
     try {
         const { userId } = req.params;
         const { phonenumber, address, company, jobtitle, salary, staffId } = req.body;
         const file = req.file;
         if (!file) { return res.status(400).send("No image in the request") }
-        const fileName = req.file.filename
-        const basepath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-        console.log(basepath)
+        const fileName = req.file.path;
 
         const user = await User.findById(userId);
 
@@ -224,7 +224,7 @@ router.put('/:userId', uploadOptions.single('image'), async (req, res) => {
         user.jobtitle = jobtitle || '';
         user.staffId = staffId || '';
         user.salary = salary || '';
-        user.image = `${basepath}${fileName}` || '';
+        user.image = fileName || '';
         user.isMember = true
 
 
@@ -248,8 +248,8 @@ router.put('/adminUpdateUser/:userId', async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
         user.fullname = fullname || '',
-            user.email = email || '',
-            user.phonenumber = phonenumber || '';
+        user.email = email || '',
+        user.phonenumber = phonenumber || '';
         user.address = address || '';
         user.company = company || '';
         user.jobtitle = jobtitle || '';
@@ -306,7 +306,7 @@ router.put('/approveUser/:id', async (req, res) => {
                 from: 'no-reply@sovereigntechltd.com',
                 to: user.email,
                 subject: 'Approval',
-                html:`
+                html: `
                 <main>
                     <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
                         <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
@@ -317,8 +317,6 @@ router.put('/approveUser/:id', async (req, res) => {
                         You can now log in to make a one-time registration fee payment and explore our great offers
                     </p>
                     <p>We want you to know that the aim of this is to simplify the burden, and we have got this right with you.</p>
-                    
-                    <p>This code expires in x minutes. Do not click any links or share with any body.</p>
                     <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>
                         <p>©️ 2023 Sovereigntechltd. All rights reserved.</p>
                 </main>
