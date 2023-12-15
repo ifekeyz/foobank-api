@@ -37,11 +37,18 @@ router.delete('/deleteCartItem/:userId/:itemId', async (req, res) => {
         const cart = await Cart.findOne({ userId });
 
         if (!cart) {
-            return res.status(404).json({ message: "Opps! Cart not found " });
+            return res.status(404).json({ message: "Oops! Cart not found " });
         }
 
+        // Logging for debugging
+        // console.log('Cart items:', cart.items);
+        // console.log('Item ID to delete:', itemId);
+
         // Find the index of the cart item to remove
-        const itemIndex = cart.items.findIndex(item => item._id === itemId);
+        const itemIndex = cart.items.findIndex(item => item._id.toString() === itemId);
+
+        // Logging for debugging
+        // console.log('Item index:', itemIndex);
 
         if (itemIndex < 0) {
             return res.status(404).json({ message: "Item not found in the cart" });
@@ -60,6 +67,8 @@ router.delete('/deleteCartItem/:userId/:itemId', async (req, res) => {
         res.status(500).json({ message: 'Error deleting cart item', error: error.message });
     }
 });
+
+
 
 
 // router.delete('/deleteCartItem/:userId/:itemId', async (req, res) => {
