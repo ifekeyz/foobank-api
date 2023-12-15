@@ -36,7 +36,7 @@ router.post('/createOrder', async (req, res) => {
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
     if(currentDay >= updatedPBD && currentDay <= payBackDay){
-      return res.status(404).json({ message: 'You can not place an order at this current state' });
+      return res.status(501).json({ message: 'You can not place an order at this current state, try again in 2-3 days' });
     }
 
     // Find the wallet entry for the specified userId
@@ -44,7 +44,8 @@ router.post('/createOrder', async (req, res) => {
 
     if (!wallet) {
       return res.status(404).json({ message: 'Wallet not found for the user' });
-    } else {
+    } 
+    else {
       if (wallet.currentPaidLoan > wallet.montlyPayBack) {
         // Create a new order with delivery details
         const newOrder = new Order({
@@ -72,7 +73,7 @@ router.post('/createOrder', async (req, res) => {
         res.status(200).json(newOrder);
 
       }
-      else if(wallet.montlyPayBack == 0){
+      else if(wallet.montlyPayBack === 0){
         const newOrder = new Order({
           userId,
           orderItems,

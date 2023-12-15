@@ -134,7 +134,7 @@ router.post('/', async (req, res) => {
                 <div style='text-align: center;  '>
                     <h1 style="background-color: #f4f4f4; padding: 8px; text-align: center; border-radius: 5px; margin: 0 50px  ">${verificationCode}</h1>
             </div>
-            <p>This code expires in x minutes. Do not click any links or share with any body.</p>
+            <p>This code expires in 5 minutes. Do not click any links or share with any body.</p>
             <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>
                 <p>©️ 2023 Sovereigntechltd. All rights reserved.</p>
             </main>
