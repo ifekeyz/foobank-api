@@ -86,7 +86,28 @@ router.post('/', async (req, res) => {
             from: 'no-reply@sovereigntechltd.com',
             to: req.body.companyEmail,
             subject: 'OTP-Request',
-            text: `Your verification code for FoodBankApp Registration is : ${verificationCode}`,
+            html: `
+            <main>
+            <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
+                <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
+            </div>
+            <h2>Hello,</h2>
+            <p>You can complete your 
+                <span style="background-color: #008B50; padding: 3px; border-radius: 2px; color: white;">FoodBankApp</span> registration with the OTP below.
+            </p>
+            <div style="text-align: center; ">
+                <h1>
+                <span style="color: #008B50; text-align: center;">One Time Password (OTP)</span>
+                </h1>
+                </div>
+                <div style='text-align: center;  '>
+                    <h1 style="background-color: #f4f4f4; padding: 8px; text-align: center; border-radius: 5px; margin: 0 50px  ">${verificationCode}</h1>
+            </div>
+            <p>This code expires in 5 minutes. Do not click any links or share with any body.</p>
+            <p>If you didn't attempt to register, please contact us at info@sovereigntechltd.com.</p>
+                <p>©️ 2023 Sovereigntechltd. All rights reserved.</p>
+            </main>
+            `
         };
 
         await transporter.sendMail(mailOptions);
@@ -270,7 +291,6 @@ router.post('/send-verification-code', async (req, res) => {
         from: 'no-reply@sovereigntechltd.com',
         to: email,
         subject: 'FoodLoanBank OTP Code',
-        
         html: `
             <main>
             <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
@@ -361,8 +381,8 @@ router.put('/approveStaff/:id', async (req, res) => {
             await user.save();
             // Email content
             const mailOptions = {
-                from: user.email,
-                to: 'info@foodbank-app.com.ng',
+                from: 'info@foodbank-app.com.ng',
+                to: 'sovereigntechnology01@gmail.com',
                 subject: `${user.company} Approval`,
                 html: `Hi <p>${user.fullname}, of user identity of ${user.id}</p>
                 <p>Has been approved by us.</p>
@@ -397,8 +417,8 @@ router.put('/declineStaff/:id', async (req, res) => {
             await user.save();
             // Email content
             const mailOptions = {
-                from: user.email,
-                to: 'info@foodbank-app.com.ng',
+                from: 'info@foodbank-app.com.ng',
+                to: 'sovereigntechnology01@gmail.com',
                 subject: `${user.company} Disapprove`,
                 html: `Hi <p>${user.fullname}, of user identity of ${user.id}</p>
                 <p>Has not been approved by us.</p>
