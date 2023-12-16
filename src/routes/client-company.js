@@ -381,7 +381,7 @@ router.put('/approveStaff/:id', async (req, res) => {
             await user.save();
             // Email content
             const mailOptions = {
-                from: 'info@foodbank-app.com.ng',
+                from: 'no-reply@sovereigntechltd.com',
                 to: 'sovereigntechnology01@gmail.com',
                 subject: `${user.company} Approval`,
                 html: `Hi <p>${user.fullname}, of user identity of ${user.id}</p>
@@ -395,7 +395,7 @@ router.put('/approveStaff/:id', async (req, res) => {
 
             return res.status(200).json({ message: 'User approved successfully' });
         } else {
-            return res.status(400).json({ message: 'User cannot be accepted in its current state' });
+            return res.status(400).json({ message: 'User has already been approved' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error', error: error.message });
@@ -417,7 +417,7 @@ router.put('/declineStaff/:id', async (req, res) => {
             await user.save();
             // Email content
             const mailOptions = {
-                from: 'info@foodbank-app.com.ng',
+                from: 'no-reply@sovereigntechltd.com',
                 to: 'sovereigntechnology01@gmail.com',
                 subject: `${user.company} Disapprove`,
                 html: `Hi <p>${user.fullname}, of user identity of ${user.id}</p>
@@ -431,7 +431,7 @@ router.put('/declineStaff/:id', async (req, res) => {
 
             return res.status(200).json({ message: 'User disapproved successfully' });
         } else {
-            return res.status(400).json({ message: 'User cannot be accepted in its current state' });
+            return res.status(400).json({ message: 'User has already been disapproved' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error', error: error.message });
