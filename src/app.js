@@ -39,6 +39,7 @@ const productRoutes = require('./routes/product')
 const walletRoutes = require('./routes/wallet')
 const clientCompanyRoutes = require('./routes/client-company')
 const driverRoutes = require('./routes/driver')
+const adsRoutes = require('./routes/ads')
 
 
 //api from env
@@ -55,6 +56,7 @@ app.use(`${api}/order`, orderRoutes);
 app.use(`${api}/admin`, adminRoutes);
 app.use(`${api}/company`,clientCompanyRoutes);
 app.use(`${api}/driver`,driverRoutes);
+app.use(`${api}/ads`, adsRoutes)
 
 app.use(helmet())
 

@@ -60,6 +60,8 @@ function authJwt(){
             {url:/\/api\/v1\/company\/change\/password(.*)/,methods:['PUT','OPTIONS']},
             {url:/\/public\/uploads(.*)/,methods:['GET','OPTIONS']},
             {url:/\/uploads(.*)/,methods:['GET','OPTIONS']},
+            {url:/\/api\/v1\/ads\/ads-details(.*)/,methods:['POST','OPTIONS']},
+            {url:/\/api\/v1\/ads\/ads-details(.*)/,methods:['GET','OPTIONS']},
             
 
         ]
