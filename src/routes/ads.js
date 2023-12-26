@@ -26,8 +26,9 @@ router.post('/ads-details', async (req, res) => {
                 <div style="background-color: #f4f4f4; text-align: center; width: 100%;">
                     <img style="width: 70px; padding: 15px;" src="https://sovereigntechltd.com/Frame%2028%20_1_.png" alt="logo">
                 </div>
-                <p>Welcome Aboard: Your Journey With Foodbank Starts Here!</p>
+                
                 <h2>Hello ${name},</h2>
+                <p>Welcome Aboard: Your Journey With Foodbank Starts Here!</p>
                 <p>
                 We're thrilled to have you onboard! You've just unlocked a new world filled with exciting products, 
                 exclusive deals, and an enriching experience that is tailored just for you.
@@ -43,7 +44,8 @@ router.post('/ads-details', async (req, res) => {
         await transporter.sendMail(mailOptions);
         const newAds = new Ads({
             name: req.body.name,
-            email: req.body.email
+            email: req.body.email,
+            companyName:req.body.companyName
         });
 
 
