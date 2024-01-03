@@ -31,7 +31,7 @@ function authJwt(){
             {url:/\/api\/v1\/order(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/admin\/getFaqs(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/admin\/getAllCompany(.*)/,methods:['GET','OPTIONS']},
-            {url:/\/api\/v1\/admin\/getFaqs(.*)/,methods:['GET','OPTIONS']},
+            {url:/\/api\/v1\/admin\/createComplaint(.*)/,methods:['POST','OPTIONS']},
             {url:/\/api\/v1\/admin\/getPaymentChargesSummary(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/admin\/flutterwave-public-key(.*)/,methods:['GET','OPTIONS']},
             {url:/\/api\/v1\/user\/send-verification-code(.*)/,methods:['POST','OPTIONS']},
